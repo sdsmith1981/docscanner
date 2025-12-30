@@ -55,4 +55,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(EmailSettings::class);
     }
+
+    public function integrations(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Integration::class);
+    }
 }

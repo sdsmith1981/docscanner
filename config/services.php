@@ -35,4 +35,16 @@ return [
         ],
     ],
 
+    'xero' => [
+        'client_id' => env('XERO_CLIENT_ID'),
+        'client_secret' => env('XERO_CLIENT_SECRET'),
+        'redirect' => env('APP_URL') . '/integrations/callback?provider=xero',
+    ],
+
+    'sage' => [
+        'client_id' => env('SAGE_CLIENT_ID'),
+        'client_secret' => env('SAGE_CLIENT_SECRET'),
+        'redirect' => env('APP_URL') . '/integrations/callback?provider=sage',
+    ],
+
 ];

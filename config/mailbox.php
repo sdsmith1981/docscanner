@@ -8,7 +8,7 @@ return [
      *
      * Supported drivers: "log", "mailgun", "sendgrid", "postmark"
      */
-    'driver' => env('MAILBOX_DRIVER', 'mail'),
+    'driver' => env('MAILBOX_DRIVER', 'log'),
 
     /*
      * The mailboxes that should be registered for this application.
