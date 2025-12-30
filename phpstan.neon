@@ -7,34 +7,17 @@ parameters:
         - database/seeders
         - routes
     excludePaths:
-        - app/Console/Kernel.php
+        - app/Console/Kernel.php (?)
         - bootstrap/app.php
         - config/app.php
         - storage/framework/*
         - vendor/*
         - public/index.php
-    checkMissingIterableValueType: false
-    checkGenericClassInNonGenericObjectType: false
-    checkFunctionNameCase: true
-    checkInternalClassCaseSensitivity: true
-    checkMissingCallableSignature: true
-    checkMissingVarTagModifier: true
-    checkNoImplicitWildcard: true
-    checkUninitializedProperties: true
     reportUnmatchedIgnoredErrors: false
     ignoreErrors:
         - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Builder#'
         - '#Access to an undefined property Illuminate\\Database\\Eloquent\\Model#'
         - '#Call to an undefined method Illuminate\\Http\\Request#'
-        - '#Method Illuminate\\Http\\Request::input() should return#'
-        - '#Method Illuminate\\Http\\Request::get() should return#'
+        - '#Method Illuminate\\Http\\Request::input\(\) should return#'
+        - '#Method Illuminate\\Http\\Request::get\(\) should return#'
         - '#Call to an undefined method Illuminate\\Testing\\TestResponse#'
-    strictRules:
-        allRules: false
-        noImplicitWildcard: true
-        strictCalls: true
-        strictComparison: true
-        strictOperators: true
-        strictProperties: true
-        strictReturnTypes: true
-        strictVoid: true

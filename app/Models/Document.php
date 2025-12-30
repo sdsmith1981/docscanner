@@ -13,7 +13,7 @@ use Laravel\Scout\Searchable;
 
 class Document extends Model
 {
-    use HasFactory, SoftDeletes, Searchable;
+    use HasFactory, Searchable, SoftDeletes;
 
     protected $fillable = [
         'tenant_id',
@@ -76,7 +76,7 @@ class Document extends Model
     public function toSearchableArray(): array
     {
         $processedData = $this->processed_data ?? [];
-        
+
         return [
             'id' => $this->id,
             'title' => $this->title,

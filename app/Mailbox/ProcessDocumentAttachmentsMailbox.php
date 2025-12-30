@@ -11,7 +11,6 @@ use App\Services\DocumentProcessingService;
 use BeyondCode\Mailbox\InboundEmail;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use ZBateson\MailMimeParser\Message;
 
 class ProcessDocumentAttachmentsMailbox
 {
@@ -28,28 +27,32 @@ class ProcessDocumentAttachmentsMailbox
             $sender = $email->from();
             $tenantId = $this->extractTenantIdFromEmail($sender);
 
-            if (!$tenantId) {
+            if (! $tenantId) {
                 Log::warning('Could not determine tenant for email', ['from' => $sender]);
+
                 return;
             }
 
             tenancy()->initialize(tenant($tenantId), function () use ($email, $sender) {
                 $user = $this->findUserByEmail($sender);
-                
-                if (!$user) {
+
+                if (! $user) {
                     Log::warning('User not found for email', ['from' => $sender]);
+
                     return;
                 }
 
                 $emailSettings = $user->emailSettings;
-                
-                if (!$emailSettings || !$emailSettings->process_email_attachments) {
+
+                if (! $emailSettings || ! $emailSettings->process_email_attachments) {
                     Log::info('Email attachments processing disabled for user', ['user_id' => $user->id]);
+
                     return;
                 }
 
-                if (!$emailSettings->isSenderAllowed($sender)) {
+                if (! $emailSettings->isSenderAllowed($sender)) {
                     Log::info('Email sender not in allowed list', ['from' => $sender, 'user_id' => $user->id]);
+
                     return;
                 }
 
@@ -86,20 +89,20 @@ class ProcessDocumentAttachmentsMailbox
     private function processAttachments(InboundEmail $email, User $user, EmailSettings $emailSettings): void
     {
         $message = $email->getMessage();
-        
+
         foreach ($message->getAllAttachmentParts() as $attachment) {
             try {
                 $filename = $attachment->getFilename();
                 $content = $attachment->getContent();
                 $contentType = $attachment->getContentType() ?? 'application/octet-stream';
 
-                if (!$this->isDocumentAttachment($filename, $contentType)) {
+                if (! $this->isDocumentAttachment($filename, $contentType)) {
                     continue;
                 }
 
                 $documentType = $this->determineDocumentType($filename, $email, $emailSettings);
-                
-                $path = "email-attachments/{$user->id}/" . uniqid() . '-' . $filename;
+
+                $path = "email-attachments/{$user->id}/".uniqid().'-'.$filename;
                 Storage::disk('s3')->put($path, $content);
 
                 $document = $user->documents()->create([
@@ -134,7 +137,7 @@ class ProcessDocumentAttachmentsMailbox
     {
         $allowedExtensions = ['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx', 'xls', 'xlsx'];
         $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
-        
+
         $allowedMimeTypes = [
             'application/pdf',
             'image/jpeg',
@@ -145,23 +148,23 @@ class ProcessDocumentAttachmentsMailbox
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         ];
 
-        return in_array($extension, $allowedExtensions) || 
+        return in_array($extension, $allowedExtensions) ||
                in_array($contentType, $allowedMimeTypes);
     }
 
     private function determineDocumentType(string $filename, InboundEmail $email, EmailSettings $emailSettings): string
     {
         $subject = strtolower($email->subject());
-        
+
         // Check email subject for document type hints
         if (str_contains($subject, 'invoice')) {
             return 'invoice';
         }
-        
+
         if (str_contains($subject, 'receipt')) {
             return 'receipt';
         }
-        
+
         if (str_contains($subject, 'purchase order') || str_contains($subject, 'po')) {
             return 'purchase_order';
         }

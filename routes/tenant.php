@@ -21,32 +21,32 @@ Route::middleware([
     Route::resource('integrations', \App\Http\Controllers\IntegrationController::class)
         ->middleware(['auth', 'verified']);
 
-        Route::prefix('processing')->as('processing.')->group(function () {
-            Route::get('/', [\App\Http\Controllers\ProcessingController::class, 'index'])
-                ->name('index');
-            Route::post('/retry/{document}', [\App\Http\Controllers\ProcessingController::class, 'retry'])
-                ->name('retry');
-            Route::get('/failed', [\App\Http\Controllers\ProcessingController::class, 'failed'])
-                ->name('failed');
-        })->middleware(['auth', 'verified']);
+    Route::prefix('processing')->as('processing.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\ProcessingController::class, 'index'])
+            ->name('index');
+        Route::post('/retry/{document}', [\App\Http\Controllers\ProcessingController::class, 'retry'])
+            ->name('retry');
+        Route::get('/failed', [\App\Http\Controllers\ProcessingController::class, 'failed'])
+            ->name('failed');
+    })->middleware(['auth', 'verified']);
 
-        Route::prefix('search')->as('search.')->group(function () {
-            Route::get('/', [\App\Http\Controllers\SearchController::class, '__invoke'])
-                ->name('index');
-            Route::get('/suggestions', [\App\Http\Controllers\SearchController::class, 'suggestions'])
-                ->name('suggestions');
-            Route::post('/advanced', [\App\Http\Controllers\SearchController::class, 'advanced'])
-                ->name('advanced');
-        })->middleware(['auth', 'verified']);
+    Route::prefix('search')->as('search.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\SearchController::class, '__invoke'])
+            ->name('index');
+        Route::get('/suggestions', [\App\Http\Controllers\SearchController::class, 'suggestions'])
+            ->name('suggestions');
+        Route::post('/advanced', [\App\Http\Controllers\SearchController::class, 'advanced'])
+            ->name('advanced');
+    })->middleware(['auth', 'verified']);
 
-        Route::prefix('email-settings')->as('email-settings.')->group(function () {
-            Route::get('/edit', [\App\Http\Controllers\EmailSettingsController::class, 'edit'])
-                ->name('edit');
-            Route::put('/update', [\App\Http\Controllers\EmailSettingsController::class, 'update'])
-                ->name('update');
-            Route::get('/generate-email', [\App\Http\Controllers\EmailSettingsController::class, 'generateEmail'])
-                ->name('generate-email');
-        })->middleware(['auth', 'verified']);
+    Route::prefix('email-settings')->as('email-settings.')->group(function () {
+        Route::get('/edit', [\App\Http\Controllers\EmailSettingsController::class, 'edit'])
+            ->name('edit');
+        Route::put('/update', [\App\Http\Controllers\EmailSettingsController::class, 'update'])
+            ->name('update');
+        Route::get('/generate-email', [\App\Http\Controllers\EmailSettingsController::class, 'generateEmail'])
+            ->name('generate-email');
+    })->middleware(['auth', 'verified']);
 
-        require __DIR__.'/settings.php';
+    require __DIR__.'/settings.php';
 });

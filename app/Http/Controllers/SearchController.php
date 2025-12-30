@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\Document;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\View\View;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -17,7 +16,7 @@ class SearchController extends Controller
     {
         $query = $request->input('q');
         $filters = $request->only(['type', 'status', 'date_from', 'date_to']);
-        
+
         if (empty($query)) {
             return Inertia::render('Search/Index', [
                 'documents' => collect(),
@@ -28,10 +27,10 @@ class SearchController extends Controller
 
         $documents = Document::search($query)
             ->where('user_id', $request->user()->id)
-            ->when($filters['type'], fn($query, $type) => $query->where('type', $type))
-            ->when($filters['status'], fn($query, $status) => $query->where('status', $status))
-            ->when($filters['date_from'], fn($query, $date) => $query->whereDate('created_at', '>=', $date))
-            ->when($filters['date_to'], fn($query, $date) => $query->whereDate('created_at', '<=', $date))
+            ->when($filters['type'], fn ($query, $type) => $query->where('type', $type))
+            ->when($filters['status'], fn ($query, $status) => $query->where('status', $status))
+            ->when($filters['date_from'], fn ($query, $date) => $query->whereDate('created_at', '>=', $date))
+            ->when($filters['date_to'], fn ($query, $date) => $query->whereDate('created_at', '<=', $date))
             ->with(['invoiceLines'])
             ->orderByDesc('created_at')
             ->paginate(20);
@@ -46,7 +45,7 @@ class SearchController extends Controller
     public function suggestions(Request $request): JsonResponse
     {
         $query = $request->input('q');
-        
+
         if (strlen($query) < 2) {
             return response()->json(['suggestions' => []]);
         }
@@ -59,7 +58,7 @@ class SearchController extends Controller
 
         $suggestions = $documents->map(function ($document) {
             $processedData = $document->processed_data ?? [];
-            
+
             return [
                 'id' => $document->id,
                 'title' => $document->title,
@@ -77,28 +76,18 @@ class SearchController extends Controller
     {
         $query = $request->input('q');
         $filters = $request->only(['type', 'status', 'date_from', 'date_to', 'min_amount', 'max_amount']);
-        
+
         $documents = Document::search($query)
             ->where('user_id', $request->user()->id)
-            ->when($filters['type'], fn($query, $type) => $query->where('type', $type))
-            ->when($filters['status'], fn($query, $status) => $query->where('status', $status))
-            ->when($filters['date_from'], fn($query, $date) => $query->whereDate('created_at', '>=', $date))
-            ->when($filters['date_to'], fn($query, $date) => $query->whereDate('created_at', '<=', $date))
-            ->when($filters['min_amount'], fn($query, $amount) => 
-                $query->whereExists(function ($q) use ($amount) {
-                    return $q->from('documents as d')
-                        ->join('invoice_lines as il', 'd.id', '=', 'il.document_id')
-                        ->where('d.id', $query->from('documents as d')->value('d.id'))
-                        ->whereRaw('SUM(il.total_amount) >= ?', [$amount]);
-                }))
+            ->when($filters['type'], fn ($query, $type) => $query->where('type', $type))
+            ->when($filters['status'], fn ($query, $status) => $query->where('status', $status))
+            ->when($filters['date_from'], fn ($query, $date) => $query->whereDate('created_at', '>=', $date))
+            ->when($filters['date_to'], fn ($query, $date) => $query->whereDate('created_at', '<=', $date))
+            ->when($filters['min_amount'], fn ($query, $amount) => $query->whereHas('invoiceLines', fn ($q) => $q->havingRaw('SUM(total_amount) >= ?', [$amount])
             )
-            ->when($filters['max_amount'], fn($query, $amount) => 
-                $query->whereExists(function ($q) use ($amount) {
-                    return $q->from('documents as d')
-                        ->join('invoice_lines as il', 'd.id', '=', 'il.document_id')
-                        ->where('d.id', $query->from('documents as d')->value('d.id'))
-                        ->whereRaw('SUM(il.total_amount) <= ?', [$amount]);
-                })
+            )
+            ->when($filters['max_amount'], fn ($query, $amount) => $query->whereHas('invoiceLines', fn ($q) => $q->havingRaw('SUM(total_amount) <= ?', [$amount])
+            )
             )
             ->with(['invoiceLines'])
             ->orderByDesc('created_at')
@@ -106,7 +95,7 @@ class SearchController extends Controller
 
         $formattedDocuments = $documents->through(function ($document) {
             $processedData = $document->processed_data ?? [];
-            
+
             return [
                 'id' => $document->id,
                 'title' => $document->title,

@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\Document;
-use App\Models\InvoiceLine;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
 
 class InvoiceValidationService
 {
@@ -15,7 +13,7 @@ class InvoiceValidationService
     {
         $processedData = $document->processed_data ?? [];
         $invoiceLines = $document->invoiceLines;
-        
+
         $validationResults = [
             'is_valid' => true,
             'errors' => [],
@@ -25,37 +23,37 @@ class InvoiceValidationService
 
         $totalValidation = $this->validateTotals($processedData, $invoiceLines);
         $validationResults['validations'][] = $totalValidation;
-        (!$totalValidation['valid']) && ($validationResults['is_valid'] = false);
-        (!$totalValidation['valid']) && ($validationResults['errors'] = array_merge($validationResults['errors'], $totalValidation['errors']));
+        (! $totalValidation['valid']) && ($validationResults['is_valid'] = false);
+        (! $totalValidation['valid']) && ($validationResults['errors'] = array_merge($validationResults['errors'], $totalValidation['errors']));
         ($totalValidation['valid']) && ($validationResults['warnings'] = array_merge($validationResults['warnings'], $totalValidation['warnings'] ?? []));
 
         $taxValidation = $this->validateTaxCalculations($invoiceLines);
         $validationResults['validations'][] = $taxValidation;
-        (!$taxValidation['valid']) && ($validationResults['is_valid'] = false);
-        (!$taxValidation['valid']) && ($validationResults['errors'] = array_merge($validationResults['errors'], $taxValidation['errors']));
+        (! $taxValidation['valid']) && ($validationResults['is_valid'] = false);
+        (! $taxValidation['valid']) && ($validationResults['errors'] = array_merge($validationResults['errors'], $taxValidation['errors']));
         ($taxValidation['valid']) && ($validationResults['warnings'] = array_merge($validationResults['warnings'], $taxValidation['warnings'] ?? []));
 
         $lineItemValidation = $this->validateLineItems($invoiceLines);
         $validationResults['validations'][] = $lineItemValidation;
-        (!$lineItemValidation['valid']) && ($validationResults['is_valid'] = false);
-        (!$lineItemValidation['valid']) && ($validationResults['errors'] = array_merge($validationResults['errors'], $lineItemValidation['errors']));
+        (! $lineItemValidation['valid']) && ($validationResults['is_valid'] = false);
+        (! $lineItemValidation['valid']) && ($validationResults['errors'] = array_merge($validationResults['errors'], $lineItemValidation['errors']));
         ($lineItemValidation['valid']) && ($validationResults['warnings'] = array_merge($validationResults['warnings'], $lineItemValidation['warnings'] ?? []));
 
         $requiredFieldsValidation = $this->validateRequiredFields($processedData);
         $validationResults['validations'][] = $requiredFieldsValidation;
-        (!$requiredFieldsValidation['valid']) && ($validationResults['is_valid'] = false);
-        (!$requiredFieldsValidation['valid']) && ($validationResults['errors'] = array_merge($validationResults['errors'], $requiredFieldsValidation['errors']));
+        (! $requiredFieldsValidation['valid']) && ($validationResults['is_valid'] = false);
+        (! $requiredFieldsValidation['valid']) && ($validationResults['errors'] = array_merge($validationResults['errors'], $requiredFieldsValidation['errors']));
 
         $dateValidation = $this->validateDates($processedData);
         $validationResults['validations'][] = $dateValidation;
-        (!$dateValidation['valid']) && ($validationResults['is_valid'] = false);
-        (!$dateValidation['valid']) && ($validationResults['errors'] = array_merge($validationResults['errors'], $dateValidation['errors']));
+        (! $dateValidation['valid']) && ($validationResults['is_valid'] = false);
+        (! $dateValidation['valid']) && ($validationResults['errors'] = array_merge($validationResults['errors'], $dateValidation['errors']));
 
         $document->update([
             'processed_data' => array_merge($processedData, [
                 'validation_results' => $validationResults,
                 'validated_at' => now()->toISOString(),
-            ])
+            ]),
         ]);
 
         return $validationResults;
@@ -69,7 +67,7 @@ class InvoiceValidationService
         $calculatedTotal = $invoiceLines->sum(function ($line) {
             return (float) $line->total_amount + (float) $line->tax_amount;
         });
-        
+
         $extractedSubtotal = (float) ($processedData['subtotal'] ?? 0);
         $calculatedSubtotal = $invoiceLines->sum('total_amount');
 
@@ -109,7 +107,7 @@ class InvoiceValidationService
         if ($result['valid'] && abs($extractedTotal - $calculatedTotal) > 0.001) {
             $result['warnings'][] = [
                 'type' => 'minor_total_difference',
-                'message' => "Minor difference in total calculations (£" . number_format(abs($extractedTotal - $calculatedTotal), 3) . ")",
+                'message' => 'Minor difference in total calculations (£'.number_format(abs($extractedTotal - $calculatedTotal), 3).')',
             ];
         }
 
@@ -128,7 +126,7 @@ class InvoiceValidationService
                 $result['valid'] = false;
                 $result['errors'][] = [
                     'type' => 'line_tax_calculation_error',
-                    'message' => "Tax calculation error on line " . ($index + 1) . ". Expected: £{$calculatedTaxAmount}, Actual: £{$actualTaxAmount}",
+                    'message' => 'Tax calculation error on line '.($index + 1).". Expected: £{$calculatedTaxAmount}, Actual: £{$actualTaxAmount}",
                     'line_number' => $index + 1,
                     'description' => $line->description,
                     'expected_tax' => $calculatedTaxAmount,
@@ -139,7 +137,7 @@ class InvoiceValidationService
             if ($line->tax_rate > 25) {
                 $result['warnings'][] = [
                     'type' => 'high_tax_rate',
-                    'message' => "Unusually high tax rate ({$line->tax_rate}%) on line " . ($index + 1) . "",
+                    'message' => "Unusually high tax rate ({$line->tax_rate}%) on line ".($index + 1).'',
                     'line_number' => $index + 1,
                     'tax_rate' => $line->tax_rate,
                 ];
@@ -149,7 +147,7 @@ class InvoiceValidationService
                 $result['valid'] = false;
                 $result['errors'][] = [
                     'type' => 'negative_tax_rate_with_positive_amount',
-                    'message' => "Negative tax rate with positive tax amount on line " . ($index + 1) . "",
+                    'message' => 'Negative tax rate with positive tax amount on line '.($index + 1).'',
                     'line_number' => $index + 1,
                     'tax_rate' => $line->tax_rate,
                 ];
@@ -169,6 +167,7 @@ class InvoiceValidationService
                 'type' => 'no_line_items',
                 'message' => 'Invoice has no line items',
             ];
+
             return $result;
         }
 
@@ -177,7 +176,7 @@ class InvoiceValidationService
                 $result['valid'] = false;
                 $result['errors'][] = [
                     'type' => 'empty_description',
-                    'message' => "Line " . ($index + 1) . " has empty description",
+                    'message' => 'Line '.($index + 1).' has empty description',
                     'line_number' => $index + 1,
                 ];
             }
@@ -186,7 +185,7 @@ class InvoiceValidationService
                 $result['valid'] = false;
                 $result['errors'][] = [
                     'type' => 'invalid_quantity',
-                    'message' => "Line " . ($index + 1) . " has invalid quantity ({$line->quantity})",
+                    'message' => 'Line '.($index + 1)." has invalid quantity ({$line->quantity})",
                     'line_number' => $index + 1,
                     'quantity' => $line->quantity,
                 ];
@@ -196,7 +195,7 @@ class InvoiceValidationService
                 $result['valid'] = false;
                 $result['errors'][] = [
                     'type' => 'negative_price',
-                    'message' => "Line " . ($index + 1) . " has negative price",
+                    'message' => 'Line '.($index + 1).' has negative price',
                     'line_number' => $index + 1,
                     'unit_price' => $line->unit_price,
                     'total_amount' => $line->total_amount,
@@ -206,7 +205,7 @@ class InvoiceValidationService
             if ($line->unit_price > 10000) {
                 $result['warnings'][] = [
                     'type' => 'high_unit_price',
-                    'message' => "Unusually high unit price (£{$line->unit_price}) on line " . ($index + 1) . "",
+                    'message' => "Unusually high unit price (£{$line->unit_price}) on line ".($index + 1).'',
                     'line_number' => $index + 1,
                     'unit_price' => $line->unit_price,
                 ];
@@ -215,7 +214,7 @@ class InvoiceValidationService
             if ($line->quantity > 10000) {
                 $result['warnings'][] = [
                     'type' => 'high_quantity',
-                    'message' => "Unusually high quantity ({$line->quantity}) on line " . ($index + 1) . "",
+                    'message' => "Unusually high quantity ({$line->quantity}) on line ".($index + 1).'',
                     'line_number' => $index + 1,
                     'quantity' => $line->quantity,
                 ];
@@ -243,9 +242,9 @@ class InvoiceValidationService
             }
         }
 
-        $hasFinancialData = !empty(array_intersect(array_keys($processedData), $optionalFields));
-        (!$hasFinancialData) && ($result['valid'] = false);
-        (!$hasFinancialData) && ($result['errors'][] = [
+        $hasFinancialData = ! empty(array_intersect(array_keys($processedData), $optionalFields));
+        (! $hasFinancialData) && ($result['valid'] = false);
+        (! $hasFinancialData) && ($result['errors'][] = [
             'type' => 'missing_financial_data',
             'message' => 'Missing financial data (invoice date, due date, or total amount)',
             'fields_needed' => $optionalFields,
@@ -263,8 +262,8 @@ class InvoiceValidationService
 
         if ($invoiceDate) {
             $invoiceDateObj = \DateTime::createFromFormat('Y-m-d', $invoiceDate);
-            (!$invoiceDateObj || $invoiceDateObj->format('Y-m-d') !== $invoiceDate) && ($result['valid'] = false);
-            (!$invoiceDateObj || $invoiceDateObj->format('Y-m-d') !== $invoiceDate) && ($result['errors'][] = [
+            (! $invoiceDateObj || $invoiceDateObj->format('Y-m-d') !== $invoiceDate) && ($result['valid'] = false);
+            (! $invoiceDateObj || $invoiceDateObj->format('Y-m-d') !== $invoiceDate) && ($result['errors'][] = [
                 'type' => 'invalid_invoice_date',
                 'message' => "Invalid invoice date format: {$invoiceDate}",
                 'invoice_date' => $invoiceDate,
@@ -281,8 +280,8 @@ class InvoiceValidationService
 
         if ($dueDate) {
             $dueDateObj = \DateTime::createFromFormat('Y-m-d', $dueDate);
-            (!$dueDateObj || $dueDateObj->format('Y-m-d') !== $dueDate) && ($result['valid'] = false);
-            (!$dueDateObj || $dueDateObj->format('Y-m-d') !== $dueDate) && ($result['errors'][] = [
+            (! $dueDateObj || $dueDateObj->format('Y-m-d') !== $dueDate) && ($result['valid'] = false);
+            (! $dueDateObj || $dueDateObj->format('Y-m-d') !== $dueDate) && ($result['errors'][] = [
                 'type' => 'invalid_due_date',
                 'message' => "Invalid due date format: {$dueDate}",
                 'due_date' => $dueDate,

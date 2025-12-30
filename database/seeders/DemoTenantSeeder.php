@@ -16,10 +16,9 @@ use Illuminate\Support\Str;
 
 class DemoTenantSeeder extends Seeder
 {
-
     public function run(): void
     {
-        $this->command->info( 'Creating demo tenant with sample data...');
+        $this->command->info('Creating demo tenant with sample data...');
 
         // Create demo tenant
         $tenant = Tenant::create([
@@ -29,7 +28,7 @@ class DemoTenantSeeder extends Seeder
             'stripe_customer_id' => 'cus_demo_'.Str::random(10),
         ]);
 
-        $this->command->info( 'Demo tenant created with ID: '.$tenant->id);
+        $this->command->info('Demo tenant created with ID: '.$tenant->id);
 
         // Create demo domain
         $tenant->domains()->create([
@@ -48,7 +47,7 @@ class DemoTenantSeeder extends Seeder
         $superAdminRole = \Spatie\Permission\Models\Role::where('name', 'super_admin')->first();
         $user->assignRole($superAdminRole);
 
-        $this->command->info( 'Demo user created: '.$user->email.' (ID: '.$user->id.')');
+        $this->command->info('Demo user created: '.$user->email.' (ID: '.$user->id.')');
 
         // Create email settings for demo user
         $emailSettings = EmailSettings::create([
@@ -61,7 +60,7 @@ class DemoTenantSeeder extends Seeder
             'delete_processed_emails' => false,
         ]);
 
-        $this->command->info( 'Email settings configured for demo user');
+        $this->command->info('Email settings configured for demo user');
 
         // Create demo Xero integration
         $xeroIntegration = Integration::create([
@@ -80,18 +79,17 @@ class DemoTenantSeeder extends Seeder
             ],
         ]);
 
-        $this->command->info( 'Xero integration created for demo tenant');
+        $this->command->info('Xero integration created for demo tenant');
 
         // Create sample documents
         $documents = Document::factory()->count(25)->create([
             'tenant_id' => $tenant->id,
             'user_id' => $user->id,
-            'title' => fn($index) => 'Demo Invoice '.($index + 1),
+            'title' => fn ($index) => 'Demo Invoice '.($index + 1),
             'type' => ['invoice', 'receipt', 'purchase_order', 'other'][array_rand($index, 3)],
             'status' => ['pending', 'processing', 'processed', 'failed'][array_rand($index, 3)],
-            'processed_data' => fn($index)
-                => [
-                'invoice_number' => 'INV-'.str_pad((string)($index + 1), 4, '0', STR_PAD_LEFT),
+            'processed_data' => fn ($index) => [
+                'invoice_number' => 'INV-'.str_pad((string) ($index + 1), 4, '0', STR_PAD_LEFT),
                 'vendor_name' => ['ACME Corp', 'Demo Company', 'Test Suppliers Ltd', 'XYZ Industries'][array_rand(
                     $index,
                     3,
@@ -106,29 +104,29 @@ class DemoTenantSeeder extends Seeder
         foreach ($documents as $document) {
             // Create invoice lines for invoice documents
             if ($document->type === 'invoice') {
-                $lineCount       = rand(1, 5);
-                $totalAmount     = $document->processed_data['total_amount'] ?? 0;
+                $lineCount = rand(1, 5);
+                $totalAmount = $document->processed_data['total_amount'] ?? 0;
                 $remainingAmount = $totalAmount;
-                $lineItems       = [];
+                $lineItems = [];
 
                 for ($i = 0; $i < $lineCount; $i++) {
-                    $lineAmount  = rand(10, 200);
+                    $lineAmount = rand(10, 200);
                     $description = 'Line item '.($i + 1);
 
                     if ($remainingAmount >= $lineAmount) {
                         $remainingAmount -= $lineAmount;
-                        $taxAmount       = round($lineAmount * 0.2, 2);
-                        $lineTotal       = $lineAmount + $taxAmount;
-                        $unitPrice       = $lineAmount / 1.5;
-                        $quantity        = 1;
-                        $taxRate         = 20; // 20% VAT
-                        $taxAmount       = round($lineAmount * 0.2, 2);
+                        $taxAmount = round($lineAmount * 0.2, 2);
+                        $lineTotal = $lineAmount + $taxAmount;
+                        $unitPrice = $lineAmount / 1.5;
+                        $quantity = 1;
+                        $taxRate = 20; // 20% VAT
+                        $taxAmount = round($lineAmount * 0.2, 2);
                     } else {
                         // Distribute remaining amount across lines
-                        $unitPrice       = $remainingAmount / $lineCount;
-                        $taxRate         = 20; // 20% VAT
-                        $taxAmount       = round($unitPrice * 0.2, 2);
-                        $lineTotal       = $unitPrice + ($unitPrice * 0.2);
+                        $unitPrice = $remainingAmount / $lineCount;
+                        $taxRate = 20; // 20% VAT
+                        $taxAmount = round($unitPrice * 0.2, 2);
+                        $lineTotal = $unitPrice + ($unitPrice * 0.2);
                         $remainingAmount -= $unitPrice + $taxAmount;
                     }
 
@@ -158,9 +156,7 @@ class DemoTenantSeeder extends Seeder
                 }
             }
 
-            $this->command(
-                'info',
-                'Created '.count($documents).' demo documents with '.count($documents).' invoice lines',
+            $this->command->info('Created '.count($documents).' demo documents with '.count($documents).' invoice lines',
             );
         }
     }

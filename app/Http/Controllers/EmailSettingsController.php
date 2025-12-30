@@ -4,20 +4,17 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\EmailSettings\UpdateEmailSettingsRequest;
-use App\Models\EmailSettings;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class EmailSettingsController extends Controller
 {
-    public function edit(Request $request): Response
+    public function __invoke(Request $request): Response
     {
         $user = $request->user();
-        
+
         $emailSettings = $user->emailSettings ?? $user->emailSettings()->create([
             'process_email_attachments' => false,
             'allowed_senders' => [],
@@ -32,37 +29,32 @@ class EmailSettingsController extends Controller
         ]);
     }
 
-    public function update(UpdateEmailSettingsRequest $request): RedirectResponse
+    public function update(Request $request): JsonResponse
     {
         $user = $request->user();
-        
-        $emailSettings = $user->emailSettings ?? $user->emailSettings()->create([
-            'process_email_attachments' => false,
-            'allowed_senders' => [],
-            'blocked_senders' => [],
-            'default_document_type' => 'invoice',
-            'auto_process_attachments' => true,
-            'delete_processed_emails' => false,
-        ]);
 
+        $emailSettings = $user->emailSettings;
         $emailSettings->update($request->validated());
 
-        return redirect()
-            ->route('email-settings.edit')
-            ->with('success', 'Email settings updated successfully.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Email settings updated successfully.',
+        ]);
     }
 
     public function generateEmail(Request $request): JsonResponse
     {
         $user = $request->user();
         $tenant = $user->tenant;
-        
-        if (!$tenant) {
-            return response()->json(['error' => 'Tenant not found'], 404);
+
+        if (! $tenant) {
+            return response()->json([
+                'error' => 'Tenant not found',
+            ], 400);
         }
 
-        $email = "tenant-{$tenant->id}@docscanner.app";
-        
+        $email = "tenant-{$tenant->id}@docscanner.test";
+
         return response()->json([
             'email' => $email,
             'instructions' => [

@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-use App\Models\User;
 use App\Models\Document;
-use Illuminate\Foundation\Testing\TestCase;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\TestCase;
 use Illuminate\Support\Facades\Storage;
-use Laravel\Sanctum;
 
 class DocumentTest extends TestCase
 {
@@ -91,7 +90,7 @@ class DocumentTest extends TestCase
 
         // Should detect the mismatch (100+90+18 = 108 vs 90+20+4 = 114)
         $this->assertNotNull($document->processed_data['validation_results']);
-        $this->assertTrue(!$document->processed_data['validation_results']['is_valid']);
+        $this->assertTrue(! $document->processed_data['validation_results']['is_valid']);
         $this->assertContains('total_mismatch', $document->processed_data['validation_results']['errors']);
     }
 
@@ -113,7 +112,7 @@ class DocumentTest extends TestCase
     public function test_search_returns_correct_pagination(): void
     {
         $user = User::factory()->create();
-        
+
         // Create 25 documents for pagination testing
         Document::factory()->count(25)->create([
             'user_id' => $user->id,

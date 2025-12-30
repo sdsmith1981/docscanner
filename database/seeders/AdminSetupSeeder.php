@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use App\Models\Tenant;
 use App\Models\User;
-use Spatie\Permission\Models\Permission;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 
 class AdminSetupSeeder extends Seeder
@@ -40,8 +38,8 @@ class AdminSetupSeeder extends Seeder
             'domain' => 'admin.docscanner.test',
         ]);
 
-        $this->command->info( 'Admin tenant created with ID: ' . $tenant->id);
-        $this->command->info( 'Admin user created: admin@docscanner.test');
-        $this->command->info( 'Access at: http://admin.docscanner.test');
+        $this->command->info('Admin tenant created with ID: '.$tenant->id);
+        $this->command->info('Admin user created: admin@docscanner.test');
+        $this->command->info('Access at: http://admin.docscanner.test');
     }
 }

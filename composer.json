@@ -20,8 +20,7 @@
         "laravel/wayfinder": "^0.1.9",
         "league/oauth2-client": "*",
         "spatie/laravel-permission": "^6.24",
-        "stancl/tenancy": "^3.9",
-        "typesense/laravel-scout-typesense-driver": "^2.1"
+        "stancl/tenancy": "^3.9"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

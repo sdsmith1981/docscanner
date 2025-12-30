@@ -10,11 +10,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Stancl\Tenancy\Contracts\TenantWithDatabase;
 use Stancl\Tenancy\Database\Concerns\HasDatabase;
 use Stancl\Tenancy\Database\Concerns\HasDomains;
-use Stancl\Tenancy\Tenancy;
 
 class Tenant extends Model implements TenantWithDatabase
 {
-    use HasFactory, HasDatabase, HasDomains;
+    use HasDatabase, HasDomains, HasFactory;
 
     protected $fillable = [
         'id',
@@ -37,7 +36,7 @@ class Tenant extends Model implements TenantWithDatabase
 
     public function getDatabaseName(): string
     {
-        return config('tenancy.database_prefix', 'tenant_') . $this->getKey();
+        return config('tenancy.database_prefix', 'tenant_').$this->getKey();
     }
 
     public function canUploadMoreDocuments(): bool

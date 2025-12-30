@@ -6,46 +6,46 @@ namespace App\Services\Accounting;
 
 use App\Models\Document;
 use App\Models\Integration;
-use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class XeroService
 {
     private const BASE_URL = 'https://api.xero.com/api.xro/2.0';
-    
+
     public function __construct(
         private Integration $integration
     ) {}
 
     public function createInvoice(Document $document): ?array
     {
-        if (!$this->integration->isXero() || $this->integration->isExpired()) {
+        if (! $this->integration->isXero() || $this->integration->isExpired()) {
             throw new \Exception('Xero integration not available or expired');
         }
 
         try {
             $invoiceData = $this->formatDocumentForXero($document);
-            
-            $response = Http::withToken($this->integration->access_token)
-                ->post(self::BASE_URL . '/Invoices', $invoiceData);
 
-            if (!$response->successful()) {
+            $response = Http::withToken($this->integration->access_token)
+                ->post(self::BASE_URL.'/Invoices', $invoiceData);
+
+            if (! $response->successful()) {
                 Log::error('Failed to create Xero invoice', [
                     'document_id' => $document->id,
                     'error' => $response->body(),
                 ]);
+
                 return null;
             }
 
             $xeroInvoice = $response->json()[0] ?? null;
-            
+
             if ($xeroInvoice) {
                 $document->update([
                     'processed_data' => array_merge(
                         $document->processed_data ?? [],
                         ['xero_invoice_id' => $xeroInvoice['InvoiceID']]
-                    )
+                    ),
                 ]);
             }
 
@@ -55,7 +55,7 @@ class XeroService
                 'document_id' => $document->id,
                 'error' => $e->getMessage(),
             ]);
-            
+
             return null;
         }
     }
@@ -68,14 +68,14 @@ class XeroService
 
         try {
             $response = Http::withToken($this->integration->access_token)
-                ->get(self::BASE_URL . '/Contacts');
+                ->get(self::BASE_URL.'/Contacts');
 
             return $response->successful() ? $response->json() : [];
         } catch (\Exception $e) {
             Log::error('Failed to fetch Xero contacts', [
                 'error' => $e->getMessage(),
             ]);
-            
+
             return [];
         }
     }
@@ -88,14 +88,14 @@ class XeroService
 
         try {
             $response = Http::withToken($this->integration->access_token)
-                ->get(self::BASE_URL . '/Accounts');
+                ->get(self::BASE_URL.'/Accounts');
 
             return $response->successful() ? $response->json() : [];
         } catch (\Exception $e) {
             Log::error('Failed to fetch Xero accounts', [
                 'error' => $e->getMessage(),
             ]);
-            
+
             return [];
         }
     }
@@ -104,7 +104,7 @@ class XeroService
     {
         try {
             $response = Http::withToken($this->integration->access_token)
-                ->get(self::BASE_URL . '/Organisation');
+                ->get(self::BASE_URL.'/Organisation');
 
             return $response->successful();
         } catch (\Exception $e) {
@@ -115,7 +115,7 @@ class XeroService
     private function formatDocumentForXero(Document $document): array
     {
         $processedData = $document->processed_data ?? [];
-        
+
         $lineItems = $document->invoiceLines->map(function ($line) {
             return [
                 'Description' => $line->description,
@@ -149,17 +149,18 @@ class XeroService
                 'client_secret' => config('services.xero.client_secret'),
             ]);
 
-            if (!$response->successful()) {
+            if (! $response->successful()) {
                 Log::error('Failed to refresh Xero token', [
                     'error' => $response->body(),
                 ]);
-                
+
                 $this->integration->update(['is_active' => false]);
+
                 return;
             }
 
             $tokenData = $response->json();
-            
+
             $this->integration->update([
                 'access_token' => $tokenData['access_token'],
                 'refresh_token' => $tokenData['refresh_token'],
@@ -169,7 +170,7 @@ class XeroService
             Log::error('Xero token refresh failed', [
                 'error' => $e->getMessage(),
             ]);
-            
+
             $this->integration->update(['is_active' => false]);
         }
     }

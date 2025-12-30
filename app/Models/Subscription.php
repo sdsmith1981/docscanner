@@ -42,8 +42,8 @@ class Subscription extends Model
 
     public function isActive(): bool
     {
-        return $this->stripe_status === 'active' || 
-               ($this->onTrial() && !$this->hasExpired());
+        return $this->stripe_status === 'active' ||
+               ($this->onTrial() && ! $this->hasExpired());
     }
 
     public function onTrial(): bool

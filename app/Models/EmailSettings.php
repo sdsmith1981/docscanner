@@ -40,7 +40,7 @@ class EmailSettings extends Model
     public function isSenderAllowed(string $email): bool
     {
         // If blocked senders list exists and contains the email, block it
-        if (!empty($this->blocked_senders) && in_array($email, $this->blocked_senders)) {
+        if (! empty($this->blocked_senders) && in_array($email, $this->blocked_senders)) {
             return false;
         }
 
