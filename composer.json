@@ -15,11 +15,13 @@
         "laravel/cashier": "^16.1",
         "laravel/fortify": "^1.30",
         "laravel/framework": "^12.0",
+        "laravel/scout": "^10.23",
         "laravel/tinker": "^2.10.1",
         "laravel/wayfinder": "^0.1.9",
         "league/oauth2-client": "*",
         "spatie/laravel-permission": "^6.24",
-        "stancl/tenancy": "^3.9"
+        "stancl/tenancy": "^3.9",
+        "typesense/laravel-scout-typesense-driver": "^2.1"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

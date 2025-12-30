@@ -30,6 +30,15 @@ Route::middleware([
                 ->name('failed');
         })->middleware(['auth', 'verified']);
 
+        Route::prefix('search')->as('search.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\SearchController::class, '__invoke'])
+                ->name('index');
+            Route::get('/suggestions', [\App\Http\Controllers\SearchController::class, 'suggestions'])
+                ->name('suggestions');
+            Route::post('/advanced', [\App\Http\Controllers\SearchController::class, 'advanced'])
+                ->name('advanced');
+        })->middleware(['auth', 'verified']);
+
         Route::prefix('email-settings')->as('email-settings.')->group(function () {
             Route::get('/edit', [\App\Http\Controllers\EmailSettingsController::class, 'edit'])
                 ->name('edit');
