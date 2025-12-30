@@ -1,0 +1,96 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * PHP Magic Numbers Checker Script
+ * 
+ * This script runs the Roave No-Floaters checker to detect magic numbers
+ * in the PHP codebase. Magic numbers should be replaced with named constants
+ * or configuration values for better maintainability.
+ */
+
+require_once __DIR__ . '/vendor/autoload.php';
+
+use Roave\NoFloater\NoFloater;
+
+echo "🔍 Checking for magic numbers in PHP code...\n";
+echo "==========================================\n\n";
+
+try {
+    $noFloater = new NoFloater();
+    
+    // Define paths to check
+    $paths = [
+        __DIR__ . '/app',
+        __DIR__ . '/config',
+        __DIR__ . '/database/factories',
+        __DIR__ . '/database/seeders',
+        __DIR__ . '/routes',
+    ];
+    
+    // Define paths to exclude
+    $excludePaths = [
+        __DIR__ . '/vendor',
+        __DIR__ . '/storage',
+        __DIR__ . '/bootstrap/cache',
+    ];
+    
+    $hasErrors = false;
+    
+    foreach ($paths as $path) {
+        if (!is_dir($path)) {
+            continue;
+        }
+        
+        echo "📁 Checking: " . str_replace(__DIR__ . '/', '', $path) . "\n";
+        
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($path, RecursiveDirectoryIterator::SKIP_DOTS)
+        );
+        
+        foreach ($iterator as $file) {
+            if ($file->getExtension() !== 'php') {
+                continue;
+            }
+            
+            $filePath = $file->getPathname();
+            
+            // Skip excluded paths
+            foreach ($excludePaths as $excludePath) {
+                if (str_starts_with($filePath, $excludePath)) {
+                    continue 2;
+                }
+            }
+            
+            $content = file_get_contents($filePath);
+            $errors = $noFloater->detectFloatersIn($content);
+            
+            if (!empty($errors)) {
+                $hasErrors = true;
+                echo "  ❌ " . str_replace(__DIR__ . '/', '', $filePath) . "\n";
+                
+                foreach ($errors as $error) {
+                    echo "    Line {$error['line']}: {$error['message']}\n";
+                }
+            }
+        }
+    }
+    
+    echo "\n==========================================\n";
+    
+    if ($hasErrors) {
+        echo "❌ Magic numbers found!\n";
+        echo "Please replace magic numbers with named constants or configuration values.\n";
+        echo "See the documentation for best practices.\n";
+        exit(1);
+    } else {
+        echo "✅ No magic numbers found!\n";
+        echo "All code follows best practices.\n";
+        exit(0);
+    }
+    
+} catch (Exception $e) {
+    echo "❌ Error running magic numbers checker:\n";
+    echo "  " . $e->getMessage() . "\n";
+    exit(1);
+}
