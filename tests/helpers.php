@@ -20,13 +20,9 @@ if (!function_exists('uploaded_file')) {
     ): \Illuminate\Http\UploadedFile {
         $size = $size ?? strlen($content);
         
-        return new \Illuminate\Http\UploadedFile(
+        return \Illuminate\Http\UploadedFile::fake()->createWithContent(
             $name,
-            $name,
-            $mimeType,
-            $size,
-            UPLOAD_ERR_OK,
-            true
+            $content
         );
     }
 }

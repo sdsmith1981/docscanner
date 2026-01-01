@@ -1,8 +1,16 @@
 <?php
 
 use Tests\TestCase;
-use Tests\Traits\RefreshDatabaseWithTenantTrait;
+use Tests\Traits\TenantTestTrait;
 
 pest()->extend(TestCase::class)
-    ->use(RefreshDatabaseWithTenantTrait::class)
+    ->use(TenantTestTrait::class)
     ->in('Feature');
+
+beforeEach(function () {
+    $this->setUpTenant();
+});
+
+afterEach(function () {
+    $this->tearDownTenant();
+});
