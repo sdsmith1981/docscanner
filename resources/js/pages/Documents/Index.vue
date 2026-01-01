@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, onMounted } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { Link } from '@inertiajs/vue3';
 
 const props = defineProps({
@@ -144,14 +144,14 @@ onMounted(() => {
                         
                         <div class="relative">
                             <button class="text-gray-400 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 p-1 rounded-md text-sm font-medium">
-                                <svg class="-mr-2 -mb-1 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9h6m-6 0v6h6a4 4 4 0 6z" />
+                                <svg class="-mr-2 -mb-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path d="M19 9h6m-6 0v6h6a4 4 4 0 6z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
                                 </svg>
                                 User Menu
                             </button>
                         </div>
-                    </div>
-                </nav>
+                    </nav>
+                </div>
             </div>
         </header>
 
@@ -163,9 +163,9 @@ onMounted(() => {
                     <div class="flex-1">
                         <input
                             v-model="searchQuery"
-                            type="text"
-                            placeholder="Search by title, vendor, or invoice number..."
                             class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-4 py-2 focus:ring-indigo-500 focus:border-indigo-500"
+                            placeholder="Search by title, vendor, or invoice number..."
+                            type="text"
                             @keyup.enter="performSearch"
                         />
                     </div>
@@ -173,8 +173,8 @@ onMounted(() => {
                     <div class="flex gap-2">
                         <select
                             v-model="selectedType"
-                            @change="resetPage"
                             class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                            @change="resetPage"
                         >
                             <option value="">All Types</option>
                             <option value="invoice">Invoices</option>
@@ -185,8 +185,8 @@ onMounted(() => {
 
                         <select
                             v-model="selectedStatus"
-                            @change="resetPage"
                             class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                            @change="resetPage"
                         >
                             <option value="">All Status</option>
                             <option value="pending">Pending</option>
@@ -199,8 +199,8 @@ onMounted(() => {
                     <div class="flex gap-2">
                         <select
                             v-model="sortBy"
-                            @change="resetPage"
                             class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                            @change="resetPage"
                         >
                             <option value="created_at">Date Created</option>
                             <option value="title">Title</option>
@@ -208,30 +208,30 @@ onMounted(() => {
 
                         <select
                             v-model="sortOrder"
-                            @change="resetPage"
                             class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                            @change="resetPage"
                         >
                             <option value="desc">Newest First</option>
                             <option value="asc">Oldest First</option>
                         </select>
 
                         <button
-                            @click="resetFilters"
                             class="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white px-4 py-2 border border-transparent rounded-md font-medium hover:bg-gray-100 dark:hover:bg-gray-700 focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            @click="resetFilters"
                         >
                             Clear Filters
                         </button>
 
                         <Link :href="route('documents.create')" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            <svg class="-ml-2 -mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-6 0v6h6a4 4 4 0 6z" />
+                            <svg class="-ml-2 -mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path d="M9 13h6m-6 0v6h6a4 4 4 0 6z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
                             </svg>
                             Upload Document
                         </Link>
                     </div>
                 </div>
             </div>
-        </div>
+
 
             <!-- Results Count -->
             <div v-if="documents.data.length > 0" class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
@@ -243,7 +243,7 @@ onMounted(() => {
 
             <!-- Documents List -->
             <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-md">
-                <ul v-if="documents.data.length > 0" role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
+                <ul v-if="documents.data.length > 0" class="divide-y divide-gray-200 dark:divide-gray-700" role="list">
                     <li v-for="document in documents.data" :key="document.id" class="hover:bg-gray-50 dark:hover:bg-gray-900">
                         <inertia-link :href="route('documents.show', document.id)">
                             <div class="px-4 py-3">
@@ -314,20 +314,19 @@ onMounted(() => {
 
                 <!-- Empty State -->
                 <div v-else class="text-center py-12">
-                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-6 0v6h6a4 4 4 0 6z" />
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path d="M9 13h6m-6 0v6h6a4 4 4 0 6z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
                     </svg>
                     <h3 class="mt-2 text-lg font-medium text-gray-900 dark:text-white">No documents found</h3>
                     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
                         {{ searchQuery ? `No documents found for "${searchQuery}"` : 'No documents found. Try adjusting your search or filters.' }}
                     </p>
                     <inertia-link :href="route('documents.create')" class="mt-4 inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-medium text-white hover:bg-indigo-700">
-                        <svg class="-mr-2 -mb-1 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-6 0v6h6a4 4 4 0 6z" />
+                        <svg class="-mr-2 -mb-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path d="M9 13h6m-6 0v6h6a4 4 4 0 6z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
                         </svg>
                         Upload Your First Document
                         </inertia-link>
-                    </inertia-link>
                 </div>
             </div>
 
@@ -349,11 +348,10 @@ onMounted(() => {
                     </span>
                 </nav>
                 
-                <nav class="relative z-0 inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                <nav aria-label="Pagination" class="relative z-0 inline-flex -space-x-px rounded-md shadow-sm">
                     <a
                         v-for="(link, i) in documents.links"
                         :key="i"
-                        :href="link.url"
                         :class="{
                             'px-3 py-2': true,
                             'relative block': true,
@@ -361,11 +359,12 @@ onMounted(() => {
                             'rounded-md': true,
                             'text-sm font-medium': true,
                         }"
+                        :href="link.url"
                     >
                         {{ link.label }}
                     </a>
                 </nav>
             </div>
-        </div>
+        </main>
     </div>
 </template>

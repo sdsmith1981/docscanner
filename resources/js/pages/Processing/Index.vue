@@ -3,8 +3,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import AuthenticatedLayout from '@/layouts/auth/AuthenticatedLayout.vue';
+// import { Progress } from '@/components/ui/progress';
+import AuthSimpleLayout from '@/layouts/auth/AuthSimpleLayout.vue';
 import { Head, Link } from '@inertiajs/vue3';
 import {
     Activity,
@@ -202,7 +202,7 @@ const getProgressValue = (document: ProcessingDocument): number => {
 <template>
     <Head title="Processing Queue" />
 
-    <AuthenticatedLayout>
+    <AuthSimpleLayout>
         <div class="container mx-auto px-4 py-8">
             <!-- Header -->
             <div class="mb-6">
@@ -606,5 +606,5 @@ const getProgressValue = (document: ProcessingDocument): number => {
                 </AlertDescription>
             </Alert>
         </div>
-    </AuthenticatedLayout>
+    </AuthSimpleLayout>
 </template>
