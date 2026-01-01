@@ -7,6 +7,8 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\TestCase;
 use Illuminate\Support\Facades\Storage;
+use Tests\CreatesApplication;
+use Illuminate\Foundation\Testing\WithFaker;
 
 class DocumentTest extends TestCase
 {
@@ -23,7 +25,7 @@ class DocumentTest extends TestCase
                 'file' => uploaded_file(base64_encode('test content')),
             ]);
 
-        $response->assertStatus(201);
+        $response->assertRedirect(); // Should redirect after successful creation
         $this->assertDatabaseHas('documents', [
             'title' => 'Test Invoice',
             'type' => 'invoice',
@@ -114,11 +116,13 @@ class DocumentTest extends TestCase
         $user = User::factory()->create();
 
         // Create 25 documents for pagination testing
-        Document::factory()->count(25)->create([
-            'user_id' => $user->id,
-            'title' => "Document {$i}",
-            'status' => 'processed',
-        ]);
+        foreach (range(1, 25) as $i) {
+            Document::factory()->create([
+                'user_id' => $user->id,
+                'title' => "Document {$i}",
+                'status' => 'processed',
+            ]);
+        }
 
         $response = $this->actingAs($user)
             ->get(route('search.index'), ['per_page' => 10]);
