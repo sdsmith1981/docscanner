@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Stancl\Tenancy\Database\Models\Tenant as BaseTenant;
 use Stancl\Tenancy\Contracts\TenantWithDatabase;
 use Stancl\Tenancy\Database\Concerns\HasDatabase;
 use Stancl\Tenancy\Database\Concerns\HasDomains;
+use Stancl\Tenancy\Database\Models\Tenant as BaseTenant;
 
 class Tenant extends BaseTenant implements TenantWithDatabase
 {
+
     use HasDatabase, HasDomains, HasFactory;
 
     protected $fillable = [
@@ -28,23 +29,24 @@ class Tenant extends BaseTenant implements TenantWithDatabase
         'document_limit' => 'integer',
     ];
 
-    //public function canUploadMoreDocuments(): bool
-    //{
-    //    $currentDocumentCount = tenancy()->initialize($this, function () {
-    //        return Document::count();
-    //    });
-    //
-    //    return $currentDocumentCount < $this->document_limit;
-    //}
-    //
-    //public function getRemainingDocumentLimit(): int
-    //{
-    //    $currentDocumentCount = tenancy()->initialize($this, function () {
-    //        return Document::count();
-    //    });
-    //
-    //    return max(0, $this->document_limit - $currentDocumentCount);
-    //}
 
+    public function canUploadMoreDocuments(): bool
+    {
+        $currentDocumentCount = function () {
+            return Document::count();
+        };
+
+        return $currentDocumentCount < $this->document_limit;
+    }
+
+
+    public function getRemainingDocumentLimit(): int
+    {
+        $currentDocumentCount = function () {
+            return Document::count();
+        };
+
+        return max(0, $this->document_limit - $currentDocumentCount);
+    }
 
 }

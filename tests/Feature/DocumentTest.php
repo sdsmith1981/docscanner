@@ -4,9 +4,22 @@ declare(strict_types=1);
 
 use App\Models\Document;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
+use Tests\Traits\TenantTestTrait;
+
+require_once __DIR__ . '/../Traits/TenantTestTrait.php';
 
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
+uses(TenantTestTrait::class);
+
+beforeEach(function () {
+    $this->setUpTenant();
+});
+
+afterEach(function () {
+    $this->tearDownTenant();
+});
 
 it('allows user to create document', function () {
     $user = User::factory()->create();
@@ -35,7 +48,7 @@ it('updates document processing status', function () {
 
     $document->update(['status' => 'processed']);
 
-    test()->assertDatabaseHas('documents', [
+    $this->assertDatabaseHas('documents', [
         'id' => $document->id,
         'status' => 'processed',
         'processed_at' => now(),

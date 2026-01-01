@@ -16,7 +16,9 @@ return new class extends Migration
             $table->enum('type', ['invoice', 'receipt', 'purchase_order', 'other'])->default('invoice');
             $table->string('file_path');
             $table->unsignedBigInteger('file_size');
+            $table->string('file_name');
             $table->string('mime_type');
+            $table->string('description');
             $table->enum('status', ['pending', 'processing', 'processed', 'failed'])->default('pending');
             $table->json('processed_data')->nullable();
             $table->text('processing_error')->nullable();

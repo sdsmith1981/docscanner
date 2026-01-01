@@ -108,7 +108,9 @@ trait TenantTestTrait
      */
     protected function runTenantMigrations(): void
     {
+        echo "Running tenant migrations for: " . $this->tenant->id . "\n";
         $this->artisan('tenants:migrate', ['--force' => true]);
+        echo "Tenant migrations completed.\n";
     }
 
     /**

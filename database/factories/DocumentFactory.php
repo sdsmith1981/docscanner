@@ -33,7 +33,7 @@ class DocumentFactory extends Factory
             'file_name' => $this->faker->word() . '.' . $this->faker->fileExtension(),
             'file_path' => 'documents/' . $this->faker->uuid() . '/' . $this->faker->word() . '.' . $this->faker->fileExtension(),
             'file_size' => $this->faker->numberBetween(1024, 10485760), // 1KB to 10MB
-            'file_mime_type' => $this->faker->mimeType(),
+            'mime_type' => $this->faker->mimeType(),
             'processing_status' => $this->faker->randomElement(['pending', 'processing', 'completed', 'failed']),
             'customer_id' => $this->faker->optional()->uuid(),
             'invoice_number' => $this->faker->optional()->numerify('INV-####'),
