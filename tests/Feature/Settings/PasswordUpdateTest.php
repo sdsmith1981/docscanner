@@ -2,18 +2,6 @@
 
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Tests\Traits\TenantTestTrait;
-
-uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
-uses(TenantTestTrait::class);
-
-beforeEach(function () {
-    $this->setUpTenant();
-});
-
-afterEach(function () {
-    $this->tearDownTenant();
-});
 
 test('password update page is displayed', function () {
     $user = User::factory()->create();

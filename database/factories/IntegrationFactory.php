@@ -28,14 +28,12 @@ class IntegrationFactory extends Factory
     public function definition(): array
     {
         return [
-            'tenant_id' => function () {
-                return auth()->user()?->tenant_id;
-            },
+            'tenant_id' => 'tenant_test',
             'user_id' => User::factory(),
-            'type' => 'xero',
+            'type' => 'accounting',
             'provider' => 'xero',
-            'access_token' => 'test_token_' . uniqid(),
-            'refresh_token' => 'test_refresh_' . uniqid(),
+            'access_token' => 'test_token_'.uniqid(),
+            'refresh_token' => 'test_refresh_'.uniqid(),
             'expires_at' => now()->addDays(30),
             'scope' => 'accounting.read',
             'provider_data' => [],

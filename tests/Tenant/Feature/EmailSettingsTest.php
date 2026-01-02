@@ -1,17 +1,8 @@
 <?php
 
 use App\Models\User;
-use Tests\Traits\TenantTestTrait;
 
-uses(TenantTestTrait::class);
 
-beforeEach(function () {
-    $this->setUpTenant();
-});
-
-afterEach(function () {
-    $this->tearDownTenant();
-});
 
 it('can create user and access email settings', function () {
     $user = $this->createUser();

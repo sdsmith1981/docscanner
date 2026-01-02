@@ -1,18 +1,6 @@
 <?php
 
 use App\Models\User;
-use Tests\Traits\TenantTestTrait;
-
-uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
-uses(TenantTestTrait::class);
-
-beforeEach(function () {
-    $this->setUpTenant();
-});
-
-afterEach(function () {
-    $this->tearDownTenant();
-});
 
 test('profile page is displayed', function () {
     $user = User::factory()->create();
