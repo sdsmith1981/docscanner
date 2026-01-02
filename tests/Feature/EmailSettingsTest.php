@@ -1,10 +1,8 @@
 <?php
 
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
 use Tests\Traits\TenantTestTrait;
 
-uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 uses(TenantTestTrait::class);
 
 beforeEach(function () {
@@ -16,8 +14,9 @@ afterEach(function () {
 });
 
 it('can create user and access email settings', function () {
-    $user = User::factory()->create();
+    $user = $this->createUser();
 
-    expect($user->emailSettings)->not->toBeNull();
+    // User should not have email settings by default (hasOne relationship)
+    expect($user->emailSettings)->toBeNull();
     expect($user->emailSettings()->count())->toBe(0);
 });

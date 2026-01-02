@@ -10,14 +10,6 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Tests\Traits\TenantTestTrait;
 
-require_once __DIR__ . '/../Traits/TenantTestTrait.php';
-
-// Ensure trait methods are available
-if (!trait_exists('Tests\Traits\TenantTestTrait')) {
-    throw new Exception('TenantTestTrait not found');
-}
-
-uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 uses(TenantTestTrait::class);
 
 beforeEach(function () {
@@ -26,6 +18,10 @@ beforeEach(function () {
 
 afterEach(function () {
     $this->tearDownTenant();
+});
+
+beforeEach(function () {
+    $this->beginDatabaseTransaction();
 });
 
 // Helper function to set up tenant context for tests that don't use trait
@@ -52,7 +48,7 @@ function setupTestTenant($test) {
 }
 
 it('allows user to create document', function () {
-    $user = User::factory()->create();
+    $user = $this->createUser();
 
     $response = test()->actingAs($user)
         ->post(route('documents.store'), [
@@ -185,7 +181,7 @@ it('allows email settings to be configured', function () {
 });
 
 it('handles integration creation flow', function () {
-    $user = User::factory()->create();
+    $user = $this->createUser();
 
     // Test Xero connection attempt
     $response = test()->actingAs($user)
